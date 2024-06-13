@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  trino-coordinator:
+    image: trinodb/trino:latest
+    container_name: trino-coordinator
+    networks:
+      - trinonet
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./coordinator:/etc/trino
+      - ./coordinator/password-authenticator.properties:/etc/trino/password-authenticator.properties
+      - ./coordinator/password.db:/etc/trino/password.db
+
+  trino-worker-1:
+    image: trinodb/trino:latest
+    container_name: trino-worker-1
+    networks:
+      - trinonet
+    volumes:
+      - ./worker/config.properties:/etc/trino/config.properties
+
+  trino-worker-2:
+    image: trinodb/trino:latest
+    container_name: trino-worker-2
+    networks:
+      - trinonet
+    volumes:
+      - ./worker/config.properties:/etc/trino/config.properties
+
+  trino-worker-3:
+    image: trinodb/trino:latest
+    container_name: trino-worker-3
+    networks:
+      - trinonet
+    volumes:
+      - ./worker/config.properties:/etc/trino/config.properties
+
+  trino-worker-4:
+    image: trinodb/trino:latest
+    container_name: trino-worker-4
+    networks:
+      - trinonet
+    volumes:
+      - ./worker/config.properties:/etc/trino/config.properties
+
+  trino-worker-5:
+    image: trinodb/trino:latest
+    container_name: trino-worker-5
+    networks:
+      - trinonet
+    volumes:
+      - ./worker/config.properties:/etc/trino/config.properties
+  
+  nginx:
+    image: nginx:latest
+    container_name: trino-nginx
+    networks:
+      - trinonet
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./certificate/cert.pem:/etc/nginx/ssl/cert.pem:ro
+      - ./certificate/private.key:/etc/nginx/ssl/private.key:ro
+
+networks:
+  trinonet:
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: 1450
+    ipam:
+      config:
+        - subnet: 172.15.0.0/16
